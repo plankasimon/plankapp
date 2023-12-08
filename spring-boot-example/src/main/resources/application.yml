@@ -6,8 +6,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/customers
     username: postgres
     password: root
-    hikari:
-      schema: cust
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -16,5 +15,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+    database: postgresql
   main:
     web-application-type: servlet
