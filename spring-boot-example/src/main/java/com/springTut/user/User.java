@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class User implements UserDetails {
 
     @Id
-    @SequenceGenerator(name = "user_id_sequence", sequenceName = "user_id_sequence", allocationSize = 5)
+    @SequenceGenerator(name = "user_id_sequence", sequenceName = "user_id_sequence")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_sequence")
     private Integer id;
     private String firstname;

@@ -1,10 +1,12 @@
 package com.springTut.auth;
 
+import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import com.springTut.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,11 +15,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService service;
+    private final UserRepository repository;
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request
-    ){
-        return ResponseEntity.ok(service.register(request));
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request){
+        if(repository.findByEmail(request.getEmail()).isPresent()){
+
+            return ResponseEntity.badRequest().build();
+        }else{
+            return ResponseEntity.ok(service.register(request));
+        }
     }
 
     @PostMapping("/authenticate")

@@ -1,7 +1,5 @@
 package com.springTut.config;
 
-import jakarta.security.auth.message.config.AuthConfig;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
