@@ -1,4 +1,4 @@
-package com.springTut.auth;
+package com.springTut.auth.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
