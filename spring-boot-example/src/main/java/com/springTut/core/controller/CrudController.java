@@ -18,9 +18,9 @@ public class CrudController {
     private final CrudService service;
 
     @GetMapping("/delete/{id}")
-    public ResponseEntity<CrudResponse> deleteUser(@PathVariable String id) {
+    public ResponseEntity<CrudResponse> deleteUser(@PathVariable Integer id) {
         try {
-            CrudResponse crudResponse = service.delete(Integer.valueOf(id));
+            CrudResponse crudResponse = service.delete(id);
             return new ResponseEntity<>(crudResponse, crudResponse.getStatus());
         } catch (Exception e) {
             CrudResponse crudResponse = CrudResponse.builder()
@@ -63,11 +63,11 @@ public class CrudController {
     }
 
     @GetMapping("/read/{id}")
-    public ResponseEntity<CrudResponse> readUser(@PathVariable Integer id){
+    public ResponseEntity<CrudResponse> readUser(@PathVariable Integer id) {
         try {
             CrudResponse response = service.readUser(id);
             return new ResponseEntity<>(response, response.getStatus());
-        }catch (Exception e){
+        } catch (Exception e) {
             CrudResponse response = CrudResponse.builder()
                     .body(e.getMessage())
                     .succes(false)

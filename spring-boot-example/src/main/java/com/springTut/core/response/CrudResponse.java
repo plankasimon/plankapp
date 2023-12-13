@@ -23,5 +23,5 @@ public class CrudResponse {
     private boolean succes;
     private HttpStatus status;
     private List<User> userList;
-    private Object userRead;
+    private User userRead;
 }

@@ -1,8 +1,12 @@
 package com.springTut.core.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.springTut.core.request.CrudRequest;
@@ -37,8 +41,10 @@ public class CrudService {
                 .succes(true)
                 .build();
     }
-    public CrudResponse readUser(Integer id){
-        var userRead = repository.findById(id);
+
+    public CrudResponse readUser(Integer id) {
+        User userRead = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
         return CrudResponse.builder()
                 .userRead(userRead)
                 .status(HttpStatus.OK)
@@ -47,20 +53,24 @@ public class CrudService {
     }
 
     public CrudResponse updateUser(Integer id, CrudRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUser = ((UserDetails) auth.getPrincipal()).getUsername();
+        Integer currentUserId = repository
+                .findByEmail(currentUser)
+                .orElseThrow(() -> new IllegalArgumentException("User error"))
+                .getId();
+        if(!Objects.equals(currentUserId, id)){
+            return CrudResponse.builder()
+                    .succes(false)
+                    .body("Active user does not match provided ID")
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build();
+        }
+        request.checkIsEmpty();
         var email = request.getEmail();
         var firstname = request.getFirstname();
         var lastname = request.getLastname();
         User user = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
-
-        if (email.isEmpty()){
-            throw new IllegalArgumentException("No email in request");
-        }
-        if (firstname.isEmpty()){
-            throw new IllegalArgumentException("No firstname in request");
-        }
-        if(lastname.isEmpty()){
-            throw new IllegalArgumentException("No lastname in request");
-        }
         user.setEmail(email);
         user.setFirstname(firstname);
         user.setLastname(lastname);
