@@ -23,6 +23,19 @@ public class CrudService {
     private final UserRepository repository;
 
     public CrudResponse delete(Integer id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUser = ((UserDetails) auth.getPrincipal()).getUsername();
+        Integer currentUserId = repository
+                .findByEmail(currentUser)
+                .orElseThrow(() -> new IllegalArgumentException("User error"))
+                .getId();
+        if (!Objects.equals(currentUserId, id)) {
+            return CrudResponse.builder()
+                    .succes(false)
+                    .body("Active user does not match provided ID")
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build();
+        }
         User user = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
         repository.delete(user);
@@ -59,7 +72,7 @@ public class CrudService {
                 .findByEmail(currentUser)
                 .orElseThrow(() -> new IllegalArgumentException("User error"))
                 .getId();
-        if(!Objects.equals(currentUserId, id)){
+        if (!Objects.equals(currentUserId, id)) {
             return CrudResponse.builder()
                     .succes(false)
                     .body("Active user does not match provided ID")
