@@ -76,19 +76,4 @@ public class PostController {
             return new ResponseEntity<>(response, response.getStatus());
         }
     }
-
-    @GetMapping("/list-posts")
-    public ResponseEntity<PostResponse> listPosts() {
-        try {
-            PostResponse response = service.listPosts();
-            return new ResponseEntity<>(response, response.getStatus());
-        } catch (Exception e) {
-            PostResponse response = PostResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .success(false)
-                    .body(e.getMessage())
-                    .build();
-            return new ResponseEntity<>(response, response.getStatus());
-        }
-    }
 }
