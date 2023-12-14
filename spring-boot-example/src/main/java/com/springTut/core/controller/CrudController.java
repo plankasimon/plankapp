@@ -17,7 +17,7 @@ public class CrudController {
 
     private final CrudService service;
 
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<CrudResponse> deleteUser(@PathVariable Integer id) {
         try {
             CrudResponse crudResponse = service.delete(id);
@@ -33,7 +33,7 @@ public class CrudController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<CrudResponse> updateUser(@PathVariable("id") Integer id, @RequestBody CrudRequest request) {
+    public ResponseEntity<CrudResponse> updateUser(@PathVariable Integer id, @RequestBody CrudRequest request) {
         try {
             CrudResponse response = service.updateUser(id, request);
             return new ResponseEntity<>(response, response.getStatus());

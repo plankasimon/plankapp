@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.springTut.auth.request.AuthenticationRequest;
 import com.springTut.auth.request.RegisterRequest;
-import com.springTut.auth.request.UserRequest;
 import com.springTut.auth.response.AuthenticationResponse;
 import com.springTut.auth.response.RegisterResponse;
 import com.springTut.auth.response.UserResponse;
@@ -65,7 +64,7 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .status(HttpStatus.OK)
-                .body("Login successfull")
+                .body("Logged in successfully")
                 .success(true)
                 .token(jwtToken)
                 .build();

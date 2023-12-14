@@ -19,7 +19,7 @@ public class CrudRequest {
 
     public void checkIsEmpty(){
         if(getFirstname().isEmpty()){
-            throw new IllegalArgumentException("No firstname in body");
+            throw new IllegalArgumentException("No firstname in request");
         }
         if (getLastname().isEmpty()){
             throw new IllegalArgumentException("No lastname in request");
