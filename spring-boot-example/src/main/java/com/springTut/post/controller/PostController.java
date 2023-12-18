@@ -62,7 +62,23 @@ public class PostController {
         }
     }
 
+    @DeleteMapping("/delete-tag-from-post/{id}")
+    public ResponseEntity<PostResponse> deleteTagFromPost(@PathVariable Integer id, @RequestBody PostRequest request){
+        try{
+            PostResponse response = service.deleteTagFromPost(id, request);
+            return new ResponseEntity<>(response, response.getStatus());
+        }catch (Exception e){
+            PostResponse response = PostResponse.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .success(false)
+                    .body(e.getMessage())
+                    .build();
+            return new ResponseEntity<>(response, response.getStatus());
+        }
+    }
+
     @DeleteMapping("/delete-post/{id}")
+
     public ResponseEntity<PostResponse> deletePost(@PathVariable Integer id) {
         try {
             PostResponse response = service.deletePost(id);

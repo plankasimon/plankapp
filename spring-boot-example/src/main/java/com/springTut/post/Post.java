@@ -2,10 +2,6 @@ package com.springTut.post;
 
 import jakarta.persistence.*;
 
-import org.springframework.data.jpa.repository.Query;
-
-import com.springTut.user.User;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "Post")
-@Table(name = "_post")
+@Table(name = "posts")
 public class Post {
 
     @Id

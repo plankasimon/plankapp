@@ -60,7 +60,7 @@ public class AuthenticationService {
                 )
         );
         var user = repository.findByEmail(request.getEmail())
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("No user found"));
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .status(HttpStatus.OK)
