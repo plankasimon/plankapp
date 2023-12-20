@@ -120,9 +120,10 @@ public class PostService {
                 .build();
     }
 
-    public PostResponse deleteTagFromPost(Integer id, PostRequest request){
+    public PostResponse deleteTagFromPost(Integer id, PostRequest request) {
+        request.checkTagEmpty();
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: "  + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
         Tags tags = tagsRepository.findTagsByTagName(request.getTag())
                 .orElseThrow(() -> new IllegalArgumentException("No tag"));
         PostTags postTags = postTagsRepository.findByTagIdAndPostId(tags.getId(), post.getId())

@@ -1,7 +1,5 @@
 package com.springTut.post.request;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
@@ -23,12 +21,19 @@ public class PostRequest {
     private String tag;
 
     private Integer userId;
-    public void checkIsEmpty(){
-        if (getTitle().isEmpty()){
+
+    public void checkIsEmpty() {
+        if (getTitle().isEmpty()) {
             throw new IllegalArgumentException("No title in request");
         }
-        if (getBody().isEmpty()){
+        if (getBody().isEmpty()) {
             throw new IllegalArgumentException("No body in request");
+        }
+    }
+
+    public void checkTagEmpty(){
+        if (getTag().isEmpty()){
+            throw new IllegalArgumentException("No tag provided in body");
         }
     }
 
