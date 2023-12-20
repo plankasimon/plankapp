@@ -1,6 +1,11 @@
 package com.springTut.post.request;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.springTut.tags.Tags;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +24,8 @@ public class PostRequest {
     private String body;
 
     private String tag;
+
+    private List<String> tags;
 
     private Integer userId;
 

@@ -31,6 +31,20 @@ public class PostController {
             return new ResponseEntity<>(response, response.getStatus());
         }
     }
+    @PostMapping("/create-post-multiple")
+    public ResponseEntity<PostResponse> createPostMultipleTags(@RequestBody PostRequest request){
+        try {
+            PostResponse response = service.createPostMultipleTags(request);
+            return new ResponseEntity<>(response, response.getStatus());
+        }catch (Exception e){
+            PostResponse response = PostResponse.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .success(false)
+                    .body(e.getMessage())
+                    .build();
+            return new ResponseEntity<>(response, response.getStatus());
+        }
+    }
 
     @GetMapping("/read-post/{id}")
     public ResponseEntity<PostResponse> readPost(@PathVariable Integer id) {

@@ -1,5 +1,6 @@
 package com.springTut.post.service;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,8 @@ public class PostService {
     private final PostTagsRepository postTagsRepository;
 
     public PostResponse createPost(PostRequest request) {
-        var user = userRepository.findById(request.getUserId()).orElseThrow(() -> new IllegalArgumentException("Invalid user id"));
+        var user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user id"));
         var post = Post.builder()
                 .title(request.getTitle())
                 .body(request.getBody())
@@ -38,7 +40,7 @@ public class PostService {
                 .build();
         postRepository.save(post);
 
-        var newTag = tagsRepository.findTagsByTagName(request.getTag());
+        var newTag = tagsRepository.findTagByTagName(request.getTag());
         if (newTag.isEmpty()) {
             var tag = Tags.builder()
                     .tagName(request.getTag())
@@ -46,12 +48,50 @@ public class PostService {
             tagsRepository.save(tag);
         }
 
-        var newTagId = tagsRepository.findTagsByTagName(request.getTag()).orElseThrow(() -> new IllegalArgumentException("No tag"));
+        var newTagId = tagsRepository.findTagByTagName(request.getTag())
+                .orElseThrow(() -> new IllegalArgumentException("No tag"));
         var postTag = PostTags.builder()
                 .postId(request.getUserId())
                 .tagId(newTagId.getId())
                 .build();
         postTagsRepository.save(postTag);
+
+        return PostResponse.builder()
+                .status(HttpStatus.OK)
+                .success(true)
+                .body("Post created successfully " + request.getTitle())
+                .build();
+    }
+
+    public PostResponse createPostMultipleTags(PostRequest request) {
+        var user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user id"));
+        var post = Post.builder()
+                .title(request.getTitle())
+                .body(request.getBody())
+                .userId(user.getId())
+                .build();
+        postRepository.save(post);
+
+        var newTag = tagsRepository.findTagsByTagName(request.getTags());
+
+        if (!newTag.containsAll(request.getTags())) {
+            for(String tag : request.getTags()){
+                var tag_ = Tags.builder()
+                        .tagName(tag)
+                        .build();
+                tagsRepository.save(tag_);
+            }
+        }
+
+        var newTagId = tagsRepository.findTagsByTagName(request.getTags());
+        for(Tags tag : newTagId){
+            var postTag = PostTags.builder()
+                    .postId(request.getUserId())
+                    .tagId(tag.getId())
+                    .build();
+            postTagsRepository.save(postTag);
+        }
 
         return PostResponse.builder()
                 .status(HttpStatus.OK)
@@ -77,13 +117,13 @@ public class PostService {
         var title = request.getTitle();
         var body = request.getBody();
 
-        var newTag = tagsRepository.findTagsByTagName(request.getTag());
+        var newTag = tagsRepository.findTagByTagName(request.getTag());
         if (newTag.isEmpty()) {
             var tag = Tags.builder()
                     .tagName(request.getTag())
                     .build();
             tagsRepository.save(tag);
-            var newTagId = tagsRepository.findTagsByTagName(request.getTag())
+            var newTagId = tagsRepository.findTagByTagName(request.getTag())
                     .orElseThrow(() -> new IllegalArgumentException("No tag"));
             Post post = postRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
@@ -93,7 +133,7 @@ public class PostService {
                     .build();
             postTagsRepository.save(postTags);
         } else {
-            var tagId = tagsRepository.findTagsByTagName(request.getTag())
+            var tagId = tagsRepository.findTagByTagName(request.getTag())
                     .orElseThrow(() -> new IllegalArgumentException("No tag"));
 
             Post post = postRepository.findById(id)
@@ -124,7 +164,7 @@ public class PostService {
         request.checkTagEmpty();
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
-        Tags tags = tagsRepository.findTagsByTagName(request.getTag())
+        Tags tags = tagsRepository.findTagByTagName(request.getTag())
                 .orElseThrow(() -> new IllegalArgumentException("No tag"));
         PostTags postTags = postTagsRepository.findByTagIdAndPostId(tags.getId(), post.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Tag and Post not paired"));
