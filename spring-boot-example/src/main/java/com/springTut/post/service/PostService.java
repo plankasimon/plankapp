@@ -1,6 +1,5 @@
 package com.springTut.post.service;
 
-import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -76,16 +75,19 @@ public class PostService {
         var newTag = tagsRepository.findTagsByTagName(request.getTags());
 
         if (!newTag.containsAll(request.getTags())) {
-            for(String tag : request.getTags()){
-                var tag_ = Tags.builder()
-                        .tagName(tag)
-                        .build();
-                tagsRepository.save(tag_);
+            for (String tag : request.getTags()) {
+                var newTagSingle = tagsRepository.findTagByTagName(tag);
+                if (newTagSingle.isEmpty()) {
+                    var tag_ = Tags.builder()
+                            .tagName(tag)
+                            .build();
+                    tagsRepository.save(tag_);
+                }
             }
         }
 
         var newTagId = tagsRepository.findTagsByTagName(request.getTags());
-        for(Tags tag : newTagId){
+        for (Tags tag : newTagId) {
             var postTag = PostTags.builder()
                     .postId(request.getUserId())
                     .tagId(tag.getId())
@@ -117,33 +119,45 @@ public class PostService {
         var title = request.getTitle();
         var body = request.getBody();
 
-        var newTag = tagsRepository.findTagByTagName(request.getTag());
-        if (newTag.isEmpty()) {
-            var tag = Tags.builder()
-                    .tagName(request.getTag())
-                    .build();
-            tagsRepository.save(tag);
-            var newTagId = tagsRepository.findTagByTagName(request.getTag())
-                    .orElseThrow(() -> new IllegalArgumentException("No tag"));
-            Post post = postRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
-            PostTags postTags = PostTags.builder()
-                    .tagId(newTagId.getId())
-                    .postId(post.getId())
-                    .build();
-            postTagsRepository.save(postTags);
+        var newTags = tagsRepository.findTagsByTagName(request.getTags());
+        if (!newTags.containsAll(request.getTags())) {
+            for (String tag : request.getTags()) {
+                var newTagSingle = tagsRepository.findTagByTagName(tag);
+                if (newTagSingle.isEmpty()) {
+                    var tag_ = Tags.builder()
+                            .tagName(tag)
+                            .build();
+                    tagsRepository.save(tag_);
+                }
+                var newTagId = tagsRepository.findTagByTagName(tag)
+                        .orElseThrow(() -> new IllegalArgumentException("No tag"));
+
+                Post post = postRepository.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
+
+                if (postTagsRepository.findByTagIdAndPostId(newTagId.getId(), post.getId()).isEmpty()){
+                    PostTags postTags = PostTags.builder()
+                            .tagId(newTagId.getId())
+                            .postId(post.getId())
+                            .build();
+                    postTagsRepository.save(postTags);
+                }
+            }
         } else {
-            var tagId = tagsRepository.findTagByTagName(request.getTag())
-                    .orElseThrow(() -> new IllegalArgumentException("No tag"));
+            for (String tag : request.getTags()) {
+                var tagId = tagsRepository.findTagByTagName(tag)
+                        .orElseThrow(() -> new IllegalArgumentException("No tag"));
 
-            Post post = postRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
-
-            PostTags postTags = PostTags.builder()
-                    .tagId(tagId.getId())
-                    .postId(post.getId())
-                    .build();
-            postTagsRepository.save(postTags);
+                Post post = postRepository.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
+                if (postTagsRepository.findByTagIdAndPostId(tagId.getId(), post.getId()).isEmpty()){
+                    PostTags postTags = PostTags.builder()
+                            .tagId(tagId.getId())
+                            .postId(post.getId())
+                            .build();
+                    postTagsRepository.save(postTags);
+                }
+            }
         }
 
         Post post = postRepository.findById(id)
