@@ -41,4 +41,10 @@ public class PostRequest {
         }
     }
 
+    public void checkTagsEmpty(){
+        if (getTags().isEmpty()){
+            throw new IllegalArgumentException("No tag provided in body");
+        }
+    }
+
 }

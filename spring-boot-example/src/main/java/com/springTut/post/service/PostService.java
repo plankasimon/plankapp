@@ -135,7 +135,7 @@ public class PostService {
                 Post post = postRepository.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
 
-                if (postTagsRepository.findByTagIdAndPostId(newTagId.getId(), post.getId()).isEmpty()){
+                if (postTagsRepository.findByTagIdAndPostId(newTagId.getId(), post.getId()).isEmpty()) {
                     PostTags postTags = PostTags.builder()
                             .tagId(newTagId.getId())
                             .postId(post.getId())
@@ -150,7 +150,7 @@ public class PostService {
 
                 Post post = postRepository.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
-                if (postTagsRepository.findByTagIdAndPostId(tagId.getId(), post.getId()).isEmpty()){
+                if (postTagsRepository.findByTagIdAndPostId(tagId.getId(), post.getId()).isEmpty()) {
                     PostTags postTags = PostTags.builder()
                             .tagId(tagId.getId())
                             .postId(post.getId())
@@ -175,18 +175,25 @@ public class PostService {
     }
 
     public PostResponse deleteTagFromPost(Integer id, PostRequest request) {
-        request.checkTagEmpty();
+        request.checkTagsEmpty();
+        var tags = tagsRepository.findTagsByTagName(request.getTags());
+        if (tags.containsAll(request.getTags())) {
+            throw new IllegalArgumentException("One of the tags does not exist");
+        }
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
-        Tags tags = tagsRepository.findTagByTagName(request.getTag())
-                .orElseThrow(() -> new IllegalArgumentException("No tag"));
-        PostTags postTags = postTagsRepository.findByTagIdAndPostId(tags.getId(), post.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Tag and Post not paired"));
-        postTagsRepository.delete(postTags);
+
+        for (String tag : request.getTags()) {
+            var tag_ = tagsRepository.findTagByTagName(tag)
+                    .orElseThrow(() -> new IllegalArgumentException("No tag found"));
+            PostTags postTags = postTagsRepository.findByTagIdAndPostId(tag_.getId(), post.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Tag and Post not paired"));
+            postTagsRepository.delete(postTags);
+        }
         return PostResponse.builder()
                 .status(HttpStatus.OK)
                 .success(true)
-                .body("Tag deleted successfully")
+                .body("Tags deleted successfully")
                 .build();
     }
 
