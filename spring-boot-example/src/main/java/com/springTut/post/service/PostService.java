@@ -177,9 +177,10 @@ public class PostService {
     public PostResponse deleteTagFromPost(Integer id, PostRequest request) {
         request.checkTagsEmpty();
         var tags = tagsRepository.findTagsByTagName(request.getTags());
-        if (tags.containsAll(request.getTags())) {
+        if (!tags.containsAll(request.getTags())) {
             throw new IllegalArgumentException("One of the tags does not exist");
         }
+
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
 
