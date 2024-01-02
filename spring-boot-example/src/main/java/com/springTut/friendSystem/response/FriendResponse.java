@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.springTut.friendSystem.FriendSystem;
 import com.springTut.user.User;
+import com.springTut.user.UserProjection;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +29,5 @@ public class FriendResponse {
 
     private List<FriendSystem> friendRequestList;
 
-    private List<User> friends;
+    private List<UserProjection> friends;
 }

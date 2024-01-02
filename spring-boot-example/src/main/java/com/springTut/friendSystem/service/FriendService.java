@@ -21,10 +21,11 @@ public class FriendService {
     private final FriendSystemRepository friendSystemRepository;
 
     private final UserRepository userRepository;
-    public FriendResponse createFriendRequest(FriendRequest request){
+
+    public FriendResponse createFriendRequest(FriendRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !(auth.getPrincipal() instanceof UserDetails)){
+        if (auth == null || !(auth.getPrincipal() instanceof UserDetails)) {
             throw new IllegalArgumentException("No user");
         }
 
@@ -36,14 +37,20 @@ public class FriendService {
         var user2 = userRepository.findById(request.getUser2())
                 .orElseThrow(() -> new IllegalArgumentException("User id not provided"));
 
-        if (user1 == user2){
+        if (user1 == user2) {
             throw new IllegalArgumentException("Cannot send yourself a friend request");
         }
 
         var friendRequestA = friendSystemRepository.findFriendRequests(user1.getId());
 
-        if (!friendRequestA.isEmpty()){
+        if (!friendRequestA.isEmpty()) {
             throw new IllegalArgumentException("Request already sent");
+        }
+
+        var friendExists = friendSystemRepository.existsFriend(user1.getId(), user2.getId());
+
+        if (friendExists) {
+            throw new IllegalArgumentException("You are already friends");
         }
 
         var friendRequest = FriendSystem.builder()
@@ -60,10 +67,10 @@ public class FriendService {
                 .build();
     }
 
-    public FriendResponse acceptFriendRequest(FriendRequest request){
+    public FriendResponse acceptFriendRequest(FriendRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !(auth.getPrincipal() instanceof UserDetails)){
+        if (auth == null || !(auth.getPrincipal() instanceof UserDetails)) {
             throw new IllegalArgumentException("No user");
         }
 
@@ -77,7 +84,7 @@ public class FriendService {
 
         var friendRequest = friendSystemRepository.findFriendRequestByUserAndId(user1.getId(), user2.getId());
 
-        if (friendRequest == null){
+        if (friendRequest == null) {
             throw new IllegalArgumentException("No friend requests");
         }
 
@@ -91,17 +98,17 @@ public class FriendService {
                 .build();
     }
 
-    public FriendResponse listFriendRequests(){
+    public FriendResponse listFriendRequests() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !(auth.getPrincipal() instanceof UserDetails)){
+        if (auth == null || !(auth.getPrincipal() instanceof UserDetails)) {
             throw new IllegalArgumentException("No user");
         }
 
         var activeUser = ((UserDetails) auth.getPrincipal()).getUsername();
 
         var user = userRepository.findByEmail(activeUser)
-                        .orElseThrow(() -> new IllegalArgumentException("No active user"));
+                .orElseThrow(() -> new IllegalArgumentException("No active user"));
 
         var friendRequests = friendSystemRepository.findFriendRequests(user.getId());
 
@@ -112,10 +119,10 @@ public class FriendService {
                 .build();
     }
 
-    public FriendResponse listFriends(){
+    public FriendResponse listFriends() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !(auth.getPrincipal() instanceof UserDetails)){
+        if (auth == null || !(auth.getPrincipal() instanceof UserDetails)) {
             throw new IllegalArgumentException("No user");
         }
 
