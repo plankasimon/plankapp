@@ -35,12 +35,6 @@ public class PostRequest {
         }
     }
 
-    public void checkTagEmpty(){
-        if (getTag().isEmpty()){
-            throw new IllegalArgumentException("No tag provided in body");
-        }
-    }
-
     public void checkTagsEmpty(){
         if (getTags().isEmpty()){
             throw new IllegalArgumentException("No tag provided in body");

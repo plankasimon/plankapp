@@ -18,11 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TagService {
 
-    private final PostRepository postRepository;
-
     private final TagsRepository tagsRepository;
-
-    private final PostTagsRepository postTagsRepository;
 
     public TagResponse createTag(TagRequest request) {
         var tag = Tags.builder()
@@ -35,6 +31,7 @@ public class TagService {
                 .body("Tag created successfully: " + request.getTagName())
                 .build();
     }
+
 
     public TagResponse readTag(Integer id) {
         Tags tags = tagsRepository.findById(id)
