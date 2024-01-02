@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.springTut.friendSystem.FriendSystem;
-import com.springTut.user.User;
 import com.springTut.user.UserProjection;
 
 import lombok.AllArgsConstructor;
