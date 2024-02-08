@@ -75,13 +75,13 @@ public class PostService {
         var newTag = tagsRepository.findTagsByTagName(request.getTags());
 
         if (!newTag.containsAll(request.getTags())) {
-            for (String tag : request.getTags()) {
-                var newTagSingle = tagsRepository.findTagByTagName(tag);
+            for (String tagName : request.getTags()) {
+                var newTagSingle = tagsRepository.findTagByTagName(tagName);
                 if (newTagSingle.isEmpty()) {
-                    var tag_ = Tags.builder()
-                            .tagName(tag)
+                    var tag = Tags.builder()
+                            .tagName(tagName)
                             .build();
-                    tagsRepository.save(tag_);
+                    tagsRepository.save(tag);
                 }
             }
         }
@@ -121,15 +121,15 @@ public class PostService {
 
         var newTags = tagsRepository.findTagsByTagName(request.getTags());
         if (!newTags.containsAll(request.getTags())) {
-            for (String tag : request.getTags()) {
-                var newTagSingle = tagsRepository.findTagByTagName(tag);
+            for (String tagName : request.getTags()) {
+                var newTagSingle = tagsRepository.findTagByTagName(tagName);
                 if (newTagSingle.isEmpty()) {
-                    var tag_ = Tags.builder()
-                            .tagName(tag)
+                    var tag = Tags.builder()
+                            .tagName(tagName)
                             .build();
-                    tagsRepository.save(tag_);
+                    tagsRepository.save(tag);
                 }
-                var newTagId = tagsRepository.findTagByTagName(tag)
+                var newTagId = tagsRepository.findTagByTagName(tagName)
                         .orElseThrow(() -> new IllegalArgumentException("No tag"));
 
                 Post post = postRepository.findById(id)
@@ -184,10 +184,10 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
 
-        for (String tag : request.getTags()) {
-            var tag_ = tagsRepository.findTagByTagName(tag)
+        for (String tagName : request.getTags()) {
+            var tag = tagsRepository.findTagByTagName(tagName)
                     .orElseThrow(() -> new IllegalArgumentException("No tag found"));
-            PostTags postTags = postTagsRepository.findByTagIdAndPostId(tag_.getId(), post.getId())
+            PostTags postTags = postTagsRepository.findByTagIdAndPostId(tag.getId(), post.getId())
                     .orElseThrow(() -> new IllegalArgumentException("Tag and Post not paired"));
             postTagsRepository.delete(postTags);
         }
