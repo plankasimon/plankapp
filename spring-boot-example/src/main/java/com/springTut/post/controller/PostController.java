@@ -92,10 +92,39 @@ public class PostController {
     }
 
     @DeleteMapping("/delete-post/{id}")
-
     public ResponseEntity<PostResponse> deletePost(@PathVariable Integer id) {
         try {
             PostResponse response = service.deletePost(id);
+            return new ResponseEntity<>(response, response.getStatus());
+        } catch (Exception e) {
+            PostResponse response = PostResponse.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .success(false)
+                    .body(e.getMessage())
+                    .build();
+            return new ResponseEntity<>(response, response.getStatus());
+        }
+    }
+
+    @PostMapping("/like-post/{id}")
+    public ResponseEntity<PostResponse> likePost(@PathVariable Integer id) {
+        try {
+            PostResponse response = service.likePost(id);
+            return new ResponseEntity<>(response, response.getStatus());
+        } catch (Exception e) {
+            PostResponse response = PostResponse.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .success(false)
+                    .body(e.getMessage())
+                    .build();
+            return new ResponseEntity<>(response, response.getStatus());
+        }
+    }
+
+    @PostMapping("/dislike-post/{id}")
+    public ResponseEntity<PostResponse> dislikePost(@PathVariable Integer id) {
+        try {
+            PostResponse response = service.dislikePost(id);
             return new ResponseEntity<>(response, response.getStatus());
         } catch (Exception e) {
             PostResponse response = PostResponse.builder()
