@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.springTut.likes.Likes;
+import com.springTut.likes.LikesRepository;
 import com.springTut.post.Post;
 import com.springTut.post.PostRepository;
 import com.springTut.post.request.PostRequest;
@@ -28,6 +30,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final TagsRepository tagsRepository;
     private final PostTagsRepository postTagsRepository;
+    private final LikesRepository likesRepository;
 
     public PostResponse createPost(PostRequest request) {
         var user = userRepository.findById(request.getUserId())
@@ -222,5 +225,95 @@ public class PostService {
                 .success(true)
                 .postList(postList)
                 .build();
+    }
+
+    public PostResponse likePost(Integer postId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUser = ((UserDetails) auth.getPrincipal()).getUsername();
+
+        Integer currentUserId = userRepository
+                .findByEmail(currentUser)
+                .orElseThrow(() -> new IllegalArgumentException("User error"))
+                .getId();
+
+        var likeStatus = likesRepository.isPostLikedByUser(postId, currentUserId);
+        var message = "";
+
+        if (likeStatus.isPresent()) {
+            var isLiked = likeStatus.get();
+            if (isLiked) {
+                deleteLikeOrDislike(postId, currentUserId);
+                message = "Post like successfully";
+                Likes.builder()
+                        .liked(true)
+                        .userId(currentUserId)
+                        .postId(postId)
+                        .build();
+            } else {
+                message = "Like removed";
+                deleteLikeOrDislike(postId,currentUserId);
+            }
+        }else {
+            message = "Post liked successfully";
+            Likes.builder()
+                    .liked(true)
+                    .userId(currentUserId)
+                    .postId(postId)
+                    .build();
+        }
+
+        return PostResponse.builder()
+                .status(HttpStatus.OK)
+                .success(true)
+                .body(message)
+                .build();
+    }
+
+    public PostResponse dislikePost(Integer postId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUser = ((UserDetails) authentication.getPrincipal()).getUsername();
+
+        Integer currentUserId = userRepository
+                .findByEmail(currentUser)
+                .orElseThrow(() -> new IllegalArgumentException("User error"))
+                .getId();
+
+        var likeStatus = likesRepository.isPostLikedByUser(postId, currentUserId);
+        var message = "";
+
+        if (likeStatus.isPresent()) {
+           var isLiked = likeStatus.get();
+           if (isLiked) {
+               deleteLikeOrDislike(postId, currentUserId);
+               message = "Post disliked successfully";
+               Likes.builder()
+                       .liked(false)
+                       .userId(currentUserId)
+                       .postId(postId)
+                       .build();
+           } else {
+               message = "Dislike removed";
+               deleteLikeOrDislike(postId,currentUserId);
+           }
+        }else {
+            message = "Post disliked successfully";
+            Likes.builder()
+                    .liked(false)
+                    .userId(currentUserId)
+                    .postId(postId)
+                    .build();
+        }
+
+        return PostResponse.builder()
+                .status(HttpStatus.OK)
+                .success(true)
+                .body(message)
+                .build();
+    }
+
+    private void deleteLikeOrDislike(Integer postId, Integer userId) {
+        var LikeRecord = likesRepository.findByPostAndUser(postId, userId)
+                        .orElseThrow(() -> new IllegalArgumentException("No like record found"));
+        likesRepository.delete(LikeRecord);
     }
 }
